@@ -27,7 +27,7 @@ const Cart = () => {
     }
   
     try {
-      const res = await axios.get("http://localhost:5000/api/cart", {
+      const res = await axios.get("https://edgistify-full-stack-developer-technical.onrender.com/api/cart", {
         headers: { Authorization: `Bearer ${token}` },
         params: { userId },
       });
@@ -53,7 +53,7 @@ const Cart = () => {
   const removeFromCart = async (productId) => {
     try {
       const res = await axios.post(
-        "http://localhost:5000/api/cart/remove", // Assuming a route to remove items
+        "https://edgistify-full-stack-developer-technical.onrender.com/api/cart/remove", // Assuming a route to remove items
         { userId, productId },
         { headers: { Authorization: `Bearer ${token}` } }
       );
