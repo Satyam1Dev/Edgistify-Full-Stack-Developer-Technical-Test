@@ -14,7 +14,7 @@ const Register = () => {
   const onSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('http://localhost:5000/api/auth/register', { fullName, email, password });
+      await axios.post('https://edgistify-full-stack-developer-technical.onrender.com/api/auth/register', { fullName, email, password });
       navigate('/login');
     } catch (err) {
       setError(err.response?.data?.message || 'Registration failed');

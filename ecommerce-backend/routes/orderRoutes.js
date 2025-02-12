@@ -1,45 +1,34 @@
 const express = require("express");
-const Order = require("../Models/Order"); // Ensure you have this model
-const authMiddleware = require("../middleware/auth");
-
+const Order = require("../models/Order"); // Ensure the path is correct
 const router = express.Router();
 
-// POST /api/orders - Place an order (Protected route)
-router.post("/", authMiddleware, async (req, res) => {
-  try {
-    const { products, totalPrice, shippingAddress } = req.body;
-    const userId = req.user.userId;
+// Place Order route
+router.post("/", async (req, res) => {
+    try {
+        const { products, totalPrice, shippingAddress, userId } = req.body;
 
-    if (!products || !totalPrice || !shippingAddress) {
-      return res.status(400).json({ message: "Please provide products, totalPrice, and shippingAddress" });
+        // Check for required fields
+        if (!products || !totalPrice || !shippingAddress || !userId) {
+            return res.status(400).json({ message: "All fields are required." });
+        }
+
+        // Process the order here
+        const newOrder = new Order({
+            products,
+            totalPrice,
+            shippingAddress,
+            userId,
+            orderStatus: "Pending",
+            paymentStatus: "Unpaid",
+        });
+
+        await newOrder.save();
+
+        return res.status(201).json({ message: "Order placed successfully!", order: newOrder });
+    } catch (err) {
+        console.error("Error placing order:", err);
+        return res.status(500).json({ message: "Error placing order", error: err.message });
     }
-    // Create new order
-    const newOrder = new Order({
-      userId,
-      products,
-      totalPrice,
-      shippingAddress,
-      paymentStatus: "Pending", // default status
-      orderStatus: "Pending"    // default status
-    });
-    await newOrder.save();
-    res.status(201).json(newOrder);
-  } catch (error) {
-    console.error("Error placing order", error);
-    res.status(500).json({ message: "Server error" });
-  }
-});
-
-// GET /api/orders - Get orders for the authenticated user (Protected route)
-router.get("/", authMiddleware, async (req, res) => {
-  try {
-    const userId = req.user.userId;
-    const orders = await Order.find({ userId });
-    res.json(orders);
-  } catch (error) {
-    console.error("Error fetching orders", error);
-    res.status(500).json({ message: "Server error" });
-  }
 });
 
 module.exports = router;
